@@ -1,0 +1,37 @@
+LABEL True
+RUN condition_a
+RUN boolean_cleanup
+
+LABEL False
+RUN condition_b
+RUN boolean_cleanup
+
+LABEL boolean_cleanup
+KILL condition_a
+CUT condition_a_carrier up
+COPY condition_a_carrier
+CUT condition_a_carrier down
+CUT condition_a_carrier down
+GLUE condition_a_backup condition_a_carrier
+GLUE condition_a_carrier condition_a
+KILL condition_a_carrier
+KILL condition_b
+CUT condition_b_carrier up
+COPY condition_b_carrier
+CUT condition_b_carrier down
+CUT condition_b_carrier down
+GLUE condition_b_backup condition_b_carrier
+GLUE condition_b_carrier condition_b
+KILL condition_b_carrier
+
+LABEL condition_a_backup
+LABEL condition_a_carrier
+LABEL condition_a
+
+LABEL condition_b_backup
+LABEL condition_b_carrier
+LABEL condition_b
+
+LABEL condition_a
+
+LABEL condition_b

@@ -1,0 +1,27 @@
+USE ./program/if.dna
+
+
+LABEL Start
+RUN LABEL_test
+
+
+LABEL test
+CUT LABEL_more_stuff down
+COPY LABEL_stuff
+LABEL cut-here
+CUT LABEL_more_stuff up
+GLUE LABEL_additional_stuff LABEL_more_stuff
+CUT LABEL_cut_here down
+
+
+LABEL stuff
+LABEL more_stuff
+LABEL additional_stuff
+
+
+
+
+
+
+
+
