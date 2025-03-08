@@ -7,7 +7,7 @@ DiaNA is a DNA-inspired language where code is always self-changing and executio
 
 At runtime, the code is separated into "Strands" which are composed of "Acids".
 
-An Acid is a single line of code, a Strand is a sequence of Acids.
+An Acid is a single line of code, composed of an operator and its parameters; a Strand is a sequence of Acids.
 
 Strands are separated by empy lines.
 
