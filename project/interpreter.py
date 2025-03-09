@@ -130,6 +130,10 @@ class Interpreter:
             for strand in self.pool.strands[key]:
                 self.log.log(
                     Severity.PROGRAM_OUT,
+                    ''
+                )
+                self.log.log(
+                    Severity.PROGRAM_OUT,
                     'strand ' + key
                 )
                 for acid in strand.acids:
@@ -139,5 +143,5 @@ class Interpreter:
                     )
         self.log.log(
             Severity.PROGRAM_OUT,
-            '___________________________\n'
+            '_____________________________________________________________________\n'
         )

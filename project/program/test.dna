@@ -15,5 +15,8 @@ LABEL a_end
 LABEL test_b
 LABEL b
 LABEL b
-# RUN test_b
-LABEL b_end
+CUT GLUE|-|x_lol|-|y_wow up
+COPY GLUE|-|x_lol|-|y_wow
+GLUE a GLUE|-|x_lol|-|y_wow
+LABEL c
+LABEL c
