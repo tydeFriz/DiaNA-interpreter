@@ -1,12 +1,15 @@
 from typing import List
+import time
+import config
+from enums import CutPos, Operator
 from custom_exceptions import InvalidOperatorException
 from logger.logger import Logger, Severity
-from pool import Pool, Strand, Acid, CutPos
+from pool import Pool, Strand, Acid
 from runner import Runner
 from const import OPERATOR_PARAMS
 
 
-START_POINT = 'LABEL Start'
+START_POINT = 'Start'
 
 
 class Interpreter:
@@ -63,10 +66,17 @@ class Interpreter:
 
     def run(self):
         while len(self.runners) > 0:
+            if config.TICK_INTERVAL > 0:
+                time.sleep(config.TICK_INTERVAL)
+
             runners_to_kill: List[int] = []
 
             for i in range(len(self.runners)):
                 runner = self.runners[i]
+
+                if config.DEBUG_PEDANTIC:
+                    print("runner " + runner.id)
+
                 runner_should_die = self.runner_tick(runner)
                 if runner_should_die:
                     runners_to_kill.append(i)
@@ -74,23 +84,24 @@ class Interpreter:
             for i in runners_to_kill[::-1]:
                 self.runners.pop(i)
 
-            self.print_state()
+            if config.DEBUG_LOGS:
+                self.print_state()
 
     def runner_tick(self, runner: Runner) -> bool:
         operator, params = runner.tick()
         if len(params) > OPERATOR_PARAMS[operator]:
             self.log.log(
                 Severity.ERROR,
-                'wrong amount of operators for line: ' + operator + ' ' + ' '.join(params)
+                'wrong amount of operators for line: ' + operator.name + ' ' + ' '.join(params)
             )
             quit()
 
         match operator:
-            case 'RUN':
+            case Operator.RUN:
                 strand = self.pool.find(params[0])
                 if strand:
                     self.runners.append(Runner(strand))
-            case 'CUT':
+            case Operator.CUT:
                 if params[1] not in ['up', 'down']:
                     self.log.log(
                         Severity.ERROR,
@@ -98,13 +109,15 @@ class Interpreter:
                     )
                 pos = CutPos.ABOVE if params[1] == 'up' else CutPos.BELOW
                 self.pool.cut(params[0], pos)
-            case 'GLUE':
+            case Operator.GLUE:
                 self.pool.glue(params[0], params[1])
-            case 'COPY':
+            case Operator.COPY:
                 self.pool.clone(params[0])
-            case 'KILL':
+            case Operator.KILL:
                 self.pool.kill(params[0])
-            case 'die':
+            case Operator.die:
+                if len(self.runners) == 1:
+                    self.print_state()
                 return True
         return False
 
@@ -122,7 +135,7 @@ class Interpreter:
                 for acid in strand.acids:
                     self.log.log(
                         Severity.PROGRAM_OUT,
-                        '   ' + acid.label
+                        '   ' + acid.get_line() + ' [' + acid.label + ']'
                     )
         self.log.log(
             Severity.PROGRAM_OUT,

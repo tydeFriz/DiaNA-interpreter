@@ -1,67 +1,9 @@
 from __future__ import annotations
-from enum import Enum
 from typing import Dict, List
-from const import OPERATOR_PARAMS
-from custom_exceptions import InvalidOperatorException
 import secrets
-
-
-class CutPos(Enum):
-    ABOVE = -1
-    BELOW = 1
-
-
-class Acid:
-
-    def __init__(self, line: str):
-        operator, parameters = line.lstrip().split(maxsplit=1)
-        if operator not in OPERATOR_PARAMS.keys():
-            raise InvalidOperatorException(operator)
-
-        self.label: str = line
-        self.operator: str = operator
-        self.params: List[str] = self._parse_parameters(parameters)
-
-    def _parse_parameters(self, parameters: str) -> List[str]:
-        parameters = parameters.split(' ')
-        return [p.replace('_', ' ') for p in parameters]
-
-
-class Strand:
-
-    def __init__(self, acids: List[Acid]):
-        self.acids: List[Acid] = acids
-        self.index: Dict[str, List[int]] = {}
-        self._compile_index()
-
-    def _compile_index(self):
-        self.index = {}
-        acid_index = 0
-        for acid in self.acids:
-            if acid.label not in self.index.keys():
-                self.index[acid.label] = []
-            self.index[acid.label].append(acid_index)
-            acid_index += 1
-
-    def append(self, strand: Strand):
-        self.acids += strand.acids
-        self._compile_index()
-
-    def cut(self, label: str, pos: CutPos) -> List[Strand]:
-        new_strands: List[Strand] = []
-        acid_index = secrets.choice(self.index[label])
-        if acid_index == 0 and pos == CutPos.ABOVE:
-            new_strands.append(self)
-        elif acid_index == len(self.acids) - 1 and pos == CutPos.BELOW:
-            new_strands.append(self)
-        elif pos == CutPos.ABOVE:
-            new_strands.append(Strand(self.acids[:acid_index]))
-            new_strands.append(Strand(self.acids[acid_index:]))
-        elif pos == CutPos.BELOW:
-            new_strands.append(Strand(self.acids[:acid_index+1]))
-            new_strands.append(Strand(self.acids[acid_index+1:]))
-
-        return new_strands
+from enums import CutPos
+from pool.strand import Strand
+from pool.acid import Acid
 
 
 class Pool:
@@ -70,7 +12,7 @@ class Pool:
         self.strands: Dict[str, List[Strand]] = {}
 
     def add_strand(self, strand: Strand):
-        label = strand.acids[0].label
+        label = strand.label()
         if label not in self.strands.keys():
             self.strands[label] = []
         self.strands[label].append(strand)
@@ -86,7 +28,7 @@ class Pool:
             return
         acids = []
         for acid in strand.acids:
-            acids.append(Acid(acid.label))
+            acids.append(Acid(acid.get_line()))
         new_strand = Strand(acids)
         self.add_strand(new_strand)
 
@@ -99,7 +41,7 @@ class Pool:
             return
 
         strand_to_cut: Strand = secrets.choice(possibilities)
-        kill_label: str = strand_to_cut.acids[0].label
+        kill_label: str = strand_to_cut.label()
         new_strands: List[Strand] = strand_to_cut.cut(label, pos)
         self.strands[kill_label].remove(strand_to_cut)
         for strand in new_strands:

@@ -1,19 +1,19 @@
-USE ./program/if.dna
+# USE ./program/if.dna
 
 
 LABEL Start
-RUN LABEL_test
+RUN test_a
 
 
-LABEL test
-CUT LABEL_more_stuff down
-COPY LABEL_stuff
-LABEL cut-here
-CUT LABEL_more_stuff up
-GLUE LABEL_additional_stuff LABEL_more_stuff
-CUT LABEL_cut_here down
+LABEL test_a
+LABEL a
+GLUE x_lol y_wow
+RUN test_b
+LABEL a_end
 
 
-LABEL stuff
-LABEL more_stuff
-LABEL additional_stuff
+LABEL test_b
+LABEL b
+LABEL b
+# RUN test_b
+LABEL b_end

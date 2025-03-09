@@ -1,37 +1,40 @@
-LABEL True
-RUN condition_a
-RUN boolean_cleanup
+LABEL if
+    RUN if_param
+    RUN if_cleanup
 
-LABEL False
-RUN condition_b
-RUN boolean_cleanup
+# if_param should be a boolean that RUNs either if_param_true or if_param_false
+LABEL if_param
 
-LABEL boolean_cleanup
-KILL condition_a
-CUT condition_a_carrier up
-COPY condition_a_carrier
-CUT condition_a_carrier down
-CUT condition_a_carrier down
-GLUE condition_a_backup condition_a_carrier
-GLUE condition_a_carrier condition_a
-KILL condition_a_carrier
-KILL condition_b
-CUT condition_b_carrier up
-COPY condition_b_carrier
-CUT condition_b_carrier down
-CUT condition_b_carrier down
-GLUE condition_b_backup condition_b_carrier
-GLUE condition_b_carrier condition_b
-KILL condition_b_carrier
+LABEL if_cleanup
+# free up the parameter carrier
+    CUT if_param down
+# cleanup the true branch
+    KILL if_param_true
+    CUT if_param_true_carrier up
+    COPY if_param_true_carrier
+    CUT if_param_true_carrier down
+    CUT if_param_true_carrier down
+    GLUE if_param_true_backup if_param_true_carrier
+    GLUE if_param_true_carrier if_param_true
+    KILL if_param_true_carrier
+# cleanup the false branch
+    KILL if_param_false
+    CUT if_param_false_carrier up
+    COPY if_param_false_carrier
+    CUT if_param_false_carrier down
+    CUT if_param_false_carrier down
+    GLUE if_param_false_backup if_param_false_carrier
+    GLUE if_param_false_carrier if_param_false
+    KILL if_param_false_carrier
 
-LABEL condition_a_backup
-LABEL condition_a_carrier
-LABEL condition_a
+LABEL if_param_true_backup
+LABEL if_param_true_carrier
+LABEL if_param_true
 
-LABEL condition_b_backup
-LABEL condition_b_carrier
-LABEL condition_b
+LABEL if_param_false_backup
+LABEL if_param_false_carrier
+LABEL if_param_false
 
-LABEL condition_a
+LABEL if_param_true
 
-LABEL condition_b
+LABEL if_param_false
