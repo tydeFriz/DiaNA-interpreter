@@ -1,3 +1,6 @@
+# path to the DiaNA program to run
+PROGRAM_FILE = './program/test.dna'
+
 # in seconds
 TICK_INTERVAL = 0.0
 
