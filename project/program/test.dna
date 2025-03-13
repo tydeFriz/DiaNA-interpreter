@@ -1,22 +1,32 @@
-# USE ./program/if.dna
+USE ./program/or.dna AS test
 
 
 LABEL Start
-RUN test_a
+    RUN test_or
 
+LABEL test_or
+    GLUE test.true true_case
+    GLUE test.false false_case
+    COPY test.bool.False
+    COPY test.bool.False
+    GLUE test.param_a test.bool.False
+    GLUE test.param_b test.bool.False
+    RUN test.or
 
-LABEL test_a
-LABEL a
-GLUE x_lol y_wow
-RUN test_b
-LABEL a_end
+LABEL cleanup
+    CUT test.param_a DOWN
+    CUT test.param_b DOWN
+    CUT test.true DOWN
+    CUT test.false DOWN
 
+LABEL true_case
+    KILL F
+    RUN cleanup
 
-LABEL test_b
-LABEL b
-LABEL b
-CUT GLUE|-|x_lol|-|y_wow up
-COPY GLUE|-|x_lol|-|y_wow
-GLUE a GLUE|-|x_lol|-|y_wow
-LABEL c
-LABEL c
+LABEL false_case
+    KILL T
+    RUN cleanup
+
+LABEL T
+
+LABEL F

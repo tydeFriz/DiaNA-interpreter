@@ -12,6 +12,10 @@ from const import OPERATOR_PARAMS
 START_POINT = 'Start'
 
 
+def use_hash(filename: str, append: str):
+    return filename + '_AS_' + append
+
+
 class Interpreter:
     def __init__(self, program_file: str):
         self.used_files: List[str] = []
@@ -19,11 +23,14 @@ class Interpreter:
         self.log: Logger = Logger()
         self.runners: List[Runner] = []
         self.pool: Pool = self._make_pool(program_file)
+        if config.PREPRINT:
+            self.print_state()
 
-    def _make_pool(self, program_file: str) -> Pool:
-        if program_file in self.used_files:
-            self.log.log(Severity.ERROR, 'circular file use triggered by a second use of: ' + program_file)
-            quit()
+    def _make_pool(self, program_file: str, append: str = '') -> Pool:
+        import_name = use_hash(program_file, append)
+        if import_name in self.used_files:
+            self.log.log(Severity.WARNING, 'USE name ambiguity triggered by: ' + import_name)
+        self.used_files.append(import_name)
 
         pool: Pool = Pool()
 
@@ -36,17 +43,27 @@ class Interpreter:
 
                 line = line.strip()
                 if line:  # line is not empty
+
                     if line.startswith('USE'):
-                        sub_pool = self._make_pool(line.split(' ', maxsplit=1)[1])
+                        line_split = line.split(' ')
+                        if len(line_split) != 4:  # USE line should be in the form USE ./path/to/file.dna AS local_name
+                            self.log.log(Severity.ERROR, 'invalid USE: ' + line)
+                            quit()
+                        sub_append = line_split[3]
+                        if append != '':
+                            sub_append = append + '.' + sub_append
+                        sub_pool = self._make_pool(line_split[1], sub_append)
                         for sub_strands in sub_pool.strands.values():
                             for sub_strand in sub_strands:
                                 pool.add_strand(sub_strand)
                         continue
+
                     try:
-                        current_acids.append(Acid(line))
+                        current_acids.append(Acid(line, append))
                     except InvalidOperatorException as e:
                         self.log.log(Severity.ERROR, 'unknown operator: ' + e.operator)
                         quit()
+
                 elif len(current_acids) > 0:  # line is empty and the previous strand was not comments only
                     new_strand = Strand(current_acids)
                     pool.add_strand(new_strand)
@@ -60,7 +77,13 @@ class Interpreter:
         if start_strand is not None:
             self.runners.append(Runner(start_strand))
         else:
-            self.log.log(Severity.WARNING, 'No starting point was found. Start point instructions is: ' + START_POINT)
+            self.log.log(
+                Severity.WARNING,
+                'No starting point was found for file "'
+                + program_file
+                + '". Start point instructions is: '
+                + START_POINT
+            )
 
         return pool
 
@@ -102,12 +125,12 @@ class Interpreter:
                 if strand:
                     self.runners.append(Runner(strand))
             case Operator.CUT:
-                if params[1] not in ['up', 'down']:
+                if params[1] not in ['UP', 'DOWN']:
                     self.log.log(
                         Severity.ERROR,
                         'bad parameter for CUT: ' + params[1]
                     )
-                pos = CutPos.ABOVE if params[1] == 'up' else CutPos.BELOW
+                pos = CutPos.ABOVE if params[1] == 'UP' else CutPos.BELOW
                 self.pool.cut(params[0], pos)
             case Operator.GLUE:
                 self.pool.glue(params[0], params[1])
@@ -139,7 +162,7 @@ class Interpreter:
                 for acid in strand.acids:
                     self.log.log(
                         Severity.PROGRAM_OUT,
-                        '   ' + acid.get_line() + ' [' + acid.label + ']'
+                        '   ' + acid.get_line() + (' [' + acid.label + ']' if config.PRINT_ACID_LABELS else '')
                     )
         self.log.log(
             Severity.PROGRAM_OUT,

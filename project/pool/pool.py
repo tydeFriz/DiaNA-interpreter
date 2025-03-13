@@ -20,6 +20,11 @@ class Pool:
     def find(self, label: str) -> Strand | None:
         if label not in self.strands.keys():
             return None
+        options = self.strands[label]
+        if len(options) == 0:
+            return None
+        if len(options) == 1:
+            return options[0]
         return secrets.choice(self.strands[label])
 
     def clone(self, label: str):
