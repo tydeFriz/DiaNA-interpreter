@@ -74,7 +74,7 @@ class Interpreter:
                 pool.add_strand(new_strand)
 
         start_strand = pool.find(START_POINT)
-        if start_strand is not None:
+        if append == '' and start_strand is not None:  # main file should always have a LABEL Start
             self.runners.append(Runner(start_strand))
         else:
             self.log.log(
@@ -100,7 +100,16 @@ class Interpreter:
                 if config.DEBUG_PEDANTIC:
                     print("runner " + runner.id)
 
-                runner_should_die = self.runner_tick(runner)
+                try:
+                    runner_should_die = self.runner_tick(runner)
+                except Exception as e:
+                    self.log.log(
+                        Severity.ERROR,
+                        "error while executing: "
+                        + runner.strand.label()
+                        + " -> "
+                        + runner.strand.acids[runner.current].label)
+                    raise e
                 if runner_should_die:
                     runners_to_kill.append(i)
 
@@ -130,6 +139,7 @@ class Interpreter:
                         Severity.ERROR,
                         'bad parameter for CUT: ' + params[1]
                     )
+                    quit()
                 pos = CutPos.ABOVE if params[1] == 'UP' else CutPos.BELOW
                 self.pool.cut(params[0], pos)
             case Operator.GLUE:

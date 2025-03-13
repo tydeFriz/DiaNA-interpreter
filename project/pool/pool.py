@@ -71,6 +71,9 @@ class Pool:
     def kill(self, label: str):
         if label not in self.strands.keys():
             return
-        strand_index = secrets.choice(range(len(self.strands[label])))
+        choices = len(self.strands[label])
+        if choices < 1:
+            return
+        strand_index = 0 if choices == 1 else secrets.choice(range(choices))
         killed = self.strands[label].pop(strand_index)
         killed.acids = []
