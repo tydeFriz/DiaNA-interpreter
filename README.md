@@ -26,12 +26,12 @@ There are 6 operators:
 Parameters are written after the operator and separated by a single space.
 Here are some examples:
 ```
-LABEL a_label
-CUT a_label UP
-GLUE a_label b_label
-COPY a_label
-KILL a_label
-RUN a_label
+LABEL a
+CUT a UP
+GLUE a b
+COPY a
+KILL a
+RUN a
 ```
 
 ### LABEL operator
@@ -63,7 +63,7 @@ CUT exmaple 1:
 
 ```
 LABEL Start
-CUT c_label UP
+CUT c UP
 
 LABEL a
 LABEL b
@@ -72,7 +72,7 @@ LABEL c
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT c_label UP
+CUT c UP
 
 LABEL a
 LABEL b
@@ -83,7 +83,7 @@ LABEL c
 CUT example 2:
 ```
 LABEL Start
-CUT a_label DOWN
+CUT a DOWN
 
 LABEL a
 LABEL b
@@ -92,7 +92,7 @@ LABEL c
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT a_label DOWN
+CUT a DOWN
 
 LABEL a
 
@@ -103,7 +103,7 @@ LABEL c
 CUT example 3:
 ```
 LABEL Start
-CUT a_label DOWN
+CUT a DOWN
 
 LABEL b
 LABEL a
@@ -114,7 +114,7 @@ LABEL b
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT a_label DOWN
+CUT a DOWN
 
 LABEL b
 LABEL a
