@@ -27,7 +27,7 @@ Parameters are written after the operator and separated by a single space.
 Here are some examples:
 ```
 LABEL a_label
-CUT a_label up
+CUT a_label UP
 GLUE a_label b_label
 COPY a_label
 KILL a_label
@@ -49,7 +49,7 @@ There can be multiple LABEL Start operators in the code, but only one of them (c
 The CUT operator separates a Strand into 2 Strands.
 It takes 2 parameter:
 - the first is a label that it will be searched in the code.
-- the second is a string wich is either "up" or "down".
+- the second is a string wich is either "UP" or "DOWN".
 
 The CUT operator searches the whole code for LABEL Acids that match its first parameter and takes one at random.
 
@@ -63,7 +63,7 @@ CUT exmaple 1:
 
 ```
 LABEL Start
-CUT a_label up
+CUT c_label UP
 
 LABEL a
 LABEL b
@@ -72,7 +72,7 @@ LABEL c
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT a_label up
+CUT c_label UP
 
 LABEL a
 LABEL b
@@ -83,7 +83,7 @@ LABEL c
 CUT example 2:
 ```
 LABEL Start
-CUT a_label down
+CUT a_label DOWN
 
 LABEL a
 LABEL b
@@ -92,7 +92,7 @@ LABEL c
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT a_label down
+CUT a_label DOWN
 
 LABEL a
 
@@ -103,7 +103,7 @@ LABEL c
 CUT example 3:
 ```
 LABEL Start
-CUT a_label down
+CUT a_label DOWN
 
 LABEL b
 LABEL a
@@ -114,7 +114,7 @@ LABEL b
 running this code will result in the following Strands:
 ```
 LABEL Start
-CUT a_label down
+CUT a_label DOWN
 
 LABEL b
 LABEL a
@@ -123,7 +123,7 @@ LABEL a
 
 LABEL b
 ```
-This will always be the case because the lonely LABEL a Acid has nothing to cut below it.
+This will always be the case because the lonely "LABEL a" Acid has nothing to cut below it.
 
 
 ### GLUE operator
